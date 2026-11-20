@@ -78,9 +78,12 @@ def load_model():
 
     model = resnet18(weights=None)
 
-    model.fc = nn.Linear(
-        in_features=512,
-        out_features=len(class_names)
+    model.fc = nn.Sequential(
+        nn.Dropout(p=0.3),
+        nn.Linear(
+            in_features=512,
+            out_features=len(class_names)
+        )
     )
 
     model.load_state_dict(
@@ -366,11 +369,14 @@ elif page == "Метрики модели":
         ax.set_ylabel("Loss")
         ax.legend()
         ax.grid()
+        fig.tight_layout()
 
-        st.pyplot(
-            fig,
-            use_container_width=True
-        )
+        # st.pyplot(
+        #     fig,
+        #     use_container_width=True
+        # )
+
+        st.pyplot(fig, width="stretch")
 
         plt.close(fig)
 
@@ -403,11 +409,13 @@ elif page == "Метрики модели":
         ax.set_ylabel("Accuracy")
         ax.legend()
         ax.grid()
+        fig.tight_layout()
 
-        st.pyplot(
-            fig,
-            use_container_width=True
-        )
+        # st.pyplot(
+        #     fig,
+        #     use_container_width=True
+        # )
+        st.pyplot(fig, width="stretch")
 
         plt.close(fig)
 
@@ -416,34 +424,40 @@ elif page == "Метрики модели":
     # ======================================
     # РАСПРЕДЕЛЕНИЕ ИЗОБРАЖЕНИЙ ПО КЛАССАМ
     # ======================================
+    # Распределение изображений по классам
+    # Распределение изображений по классам
     st.subheader("Распределение изображений по видам птиц")
 
     class_distribution = metrics["class_distribution"]
 
-    fig, ax = plt.subplots(figsize=(16, 6))
-
-    ax.bar(
-        range(1, len(class_distribution) + 1),
-        list(class_distribution.values())
+    # Сортируем классы по количеству изображений
+    sorted_classes = sorted(
+        class_distribution.items(),
+        key=lambda x: x[1]
     )
 
-    ax.set_xlim(0, len(class_distribution) + 1)
-    ax.set_xticks(range(25, len(class_distribution) + 1, 25))
-    ax.set_ylim(bottom=0)
+    fig, ax = plt.subplots(figsize=(10, 20))
 
-    ax.set_xlabel("Класс")
-    ax.set_ylabel("Количество изображений")
-    ax.set_title("Bird Dataset Class Distribution")
-
-    st.pyplot(
-        fig,
-        use_container_width=True
+    ax.barh(
+        [class_name for class_name, count in sorted_classes],
+        [count for class_name, count in sorted_classes]
     )
 
+    ax.invert_yaxis()
+    ax.set_xlim(left=0)
+    ax.margins(y=0)
+    
+    ax.set_xlim(left=0)
+
+    ax.set_xlabel("Количество изображений")
+    ax.set_ylabel("Виды птиц")
+    ax.set_title("Распределение изображений по классам")
+
+    ax.grid(axis="x", alpha=0.3)
+    plt.tight_layout()
+
+    st.pyplot(fig)
     plt.close(fig)
-
-    st.divider()
-
 
     # ======================================
     # МАТРИЦА ОШИБОК
