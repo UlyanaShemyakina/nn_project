@@ -2,3 +2,11 @@ env/
 __pycache__/
 .ipynb_checkpoints/
 *.pyc
+
+# Датасеты и архивы
+images/
+*.tgz
+*.zip
+
+draft.app
+text.txt
